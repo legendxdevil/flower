@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Icons } from "../../lib/icons";
 import { useNavigate } from "react-router-dom";
 import { useFavorites } from "../../hooks/useFavorites";
-import { GlassButton } from "../ui/apple-tahoe-liquid-glass-button";
+import { GlassButton } from "../UI/apple-tahoe-liquid-glass-button";
 
 const FlowerLogoIcon = ({ className = "w-5 h-5" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className={className} fill="none" stroke="currentColor" strokeWidth="4">
