@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Measure Collage Templates</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+      background: #f0f0f0;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    @media (min-width: 768px) {
+      #canvases.container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+      }
+    }
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      max-width: 100%;
+      max-height: 480px;
+      width: auto;
+      height: auto;
+    }
+    pre {
+      background: #222;
+      color: #0f0;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <h1>Measure Collage Templates</h1>
+  <div class="container">
+    <div class="card">
+      <button onclick="measureAll()">Analyze All Templates</button>
+      <div id="status">Click the button to start.</div>
+      <div id="detection-summary" style="margin-top: 15px; font-family: monospace; font-size: 13px; color: blue; white-space: pre-wrap;"></div>
+    </div>
+    <div id="canvases" class="container"></div>
+  </div>
+
+  <script>
+    const COORDINATES = {
+      "1 images.jpg": [
+        { x: 55, y: 343, w: 554, h: 550 }
+      ],
+      "2 images.jpg": [
+        { x: 169, y: 245, w: 398, h: 286 },
+        { x: 195, y: 745, w: 414, h: 278 }
+      ],
+      "3 images.jpg": [
+        { x: 19, y: 51, w: 698, h: 324 },
+        { x: 21, y: 463, w: 694, h: 334 },
+        { x: 19, y: 905, w: 698, h: 322 }
+      ],
+      "4 images.jpg": [
+        { x: 99, y: 309, w: 236, h: 234 },
+        { x: 424, y: 423, w: 236, h: 234 },
+        { x: 110, y: 674, w: 236, h: 234 },
+        { x: 391, y: 865, w: 236, h: 234 }
+      ],
+      "5 images.jpg": [
+        { x: 159, y: 105, w: 314, h: 234 },
+        { x: 303, y: 439, w: 278, h: 212 },
+        { x: 83, y: 721, w: 246, h: 184 },
+        { x: 449, y: 765, w: 216, h: 290 },
+        { x: 59, y: 1025, w: 236, h: 176 }
+      ],
+      "6 images.jpg": [
+        { x: 65, y: 261, w: 252, h: 250 },
+        { x: 425, y: 237, w: 252, h: 250 },
+        { x: 43, y: 567, w: 250, h: 252 },
+        { x: 341, y: 537, w: 256, h: 254 },
+        { x: 135, y: 839, w: 270, h: 268 },
+        { x: 453, y: 877, w: 248, h: 250 }
+      ],
+      "7 images.jpg": [
+        { x: 11, y: 89, w: 308, h: 306 },
+        { x: 422, y: 92, w: 296, h: 276 },
+        { x: 27, y: 417, w: 316, h: 314 },
+        { x: 429, y: 397, w: 298, h: 294 },
+        { x: 1, y: 771, w: 296, h: 294 },
+        { x: 429, y: 721, w: 304, h: 302 },
+        { x: 224, y: 990, w: 288, h: 244 }
+      ]
+    };
+
+    async function measureAll() {
+      const statusDiv = document.getElementById("status");
+      const canvasesDiv = document.getElementById("canvases");
+      canvasesDiv.innerHTML = "";
+      statusDiv.innerText = "Drawing configured slots...";
+
+      for (const t of Object.keys(COORDINATES)) {
+        statusDiv.innerText = `Loading ${t}...`;
+        const img = new Image();
+        img.src = `/Collage/${t}`;
+        await new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = () => {
+            console.error("Failed to load", t);
+            resolve();
+          };
+        });
+
+        if (!img.complete || img.naturalWidth === 0) {
+          continue;
+        }
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `<h3>${t} (${img.naturalWidth}x${img.naturalHeight})</h3>`;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        card.appendChild(canvas);
+
+        const coordsOutput = document.createElement("textarea");
+        coordsOutput.style.width = "100%";
+        coordsOutput.style.height = "50px";
+        coordsOutput.style.marginTop = "10px";
+        coordsOutput.style.fontFamily = "monospace";
+        coordsOutput.placeholder = "Click on the cloud to detect slot coordinates...";
+        card.appendChild(coordsOutput);
+
+        const pre = document.createElement("pre");
+        pre.id = `pre-${t.replace(/\s+/g, '_')}`;
+        card.appendChild(pre);
+        canvasesDiv.appendChild(card);
+
+        const slots = COORDINATES[t];
+
+        const drawBoxes = () => {
+          ctx.drawImage(img, 0, 0);
+          ctx.strokeStyle = "purple";
+          ctx.lineWidth = 5;
+          slots.forEach((s, idx) => {
+            ctx.strokeRect(s.x, s.y, s.w, s.h);
+            ctx.fillStyle = "purple";
+            ctx.font = "bold 28px Arial";
+            ctx.fillText(idx + 1, s.x + 15, s.y + 35);
+          });
+        };
+
+        drawBoxes();
+
+        canvas.addEventListener("click", (e) => {
+          const rect = canvas.getBoundingClientRect();
+          const scaleX = canvas.width / rect.width;
+          const scaleY = canvas.height / rect.height;
+          const clickX = Math.round((e.clientX - rect.left) * scaleX);
+          const clickY = Math.round((e.clientY - rect.top) * scaleY);
+
+          // Get exact slot coordinates using flood fill from clicked coordinate
+          const detected = floodFillFromClick(canvas, clickX, clickY, 15);
+          drawBoxes();
+
+          if (detected && detected.w > 40 && detected.h > 40) {
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 5;
+            ctx.strokeRect(detected.x, detected.y, detected.w, detected.h);
+            ctx.fillStyle = "red";
+            ctx.fillText("Detected", detected.x + 15, detected.y + 70);
+            coordsOutput.value = `Detected Slot: { x: ${detected.x}, y: ${detected.y}, w: ${detected.w}, h: ${detected.h} }`;
+          } else {
+            coordsOutput.value = `Clicked: { x: ${clickX}, y: ${clickY} } (No cloud detected, try clicking another pixel in the cloud)`;
+          }
+        });
+
+        if (t === "4 images.jpg") {
+          const s2 = floodFillFromClick(canvas, 520, 530, 55);
+          const s3 = floodFillFromClick(canvas, 228, 757, 55);
+          document.getElementById("detection-summary").innerText += `4 images.jpg:\n - Slot 2: ${JSON.stringify(s2)}\n - Slot 3: ${JSON.stringify(s3)}\n\n`;
+        }
+        if (t === "7 images.jpg") {
+          const s2 = floodFillFromClick(canvas, 570, 240, 55);
+          const s7 = floodFillFromClick(canvas, 368, 1090, 55);
+          document.getElementById("detection-summary").innerText += `7 images.jpg:\n - Slot 2: ${JSON.stringify(s2)}\n - Slot 7: ${JSON.stringify(s7)}\n\n`;
+        }
+
+        pre.innerText = JSON.stringify(slots, null, 2);
+      }
+
+      statusDiv.innerText = "Static coordinate configurations rendered successfully!";
+    }
+
+    function findSlotsPrecise(canvas, count, type) {
+      const ctx = canvas.getContext("2d");
+      const width = canvas.width;
+      const height = canvas.height;
+      const imgData = ctx.getImageData(0, 0, width, height);
+      const data = imgData.data;
+
+      const visited = new Uint8Array(width * height);
+      const components = [];
+
+      // Helper to check if pixel is part of a slot
+      function isSlotPixel(x, y) {
+        const idx = (y * width + x) * 4;
+        const r = data[idx];
+        const g = data[idx + 1];
+        const b = data[idx + 2];
+        const a = data[idx + 3];
+        if (a < 100) return false;
+
+        if (type === "white-slots") {
+          // Pure white slot, R, G, B all very high
+          return r > 248 && g > 248 && b > 248;
+        }
+
+        if (type === "cloud-white-bg") {
+          // Cloud frame with white background. We want the checked pattern, so NOT pure white background
+          const isWhiteBg = r > 252 && g > 252 && b > 252;
+          return !isWhiteBg && r > 180 && g > 195 && b > 180 && Math.abs(r - g) < 30 && Math.abs(b - g) < 30;
+        }
+
+        if (type === "cream-slots-white-bg") {
+          // Cream labels with white background. Cream is light but not pure white.
+          const isWhiteBg = r > 252 && g > 252 && b > 252;
+          return !isWhiteBg && r > 225 && g > 215 && b > 195;
+        }
+
+        if (type === "cloud-gradient-bg") {
+          // Ignore top-right lily area
+          if (y < 200 && x > 400) return false;
+          // Ignore bottom plush/text area
+          if (y > 1100) return false;
+
+          // Green checked clouds on pink-green gradient
+          return r > 180 && g > 195 && b > 180 && Math.abs(r - g) < 28 && Math.abs(b - g) < 28;
+        }
+
+        return false;
+      }
+
+      // Flood fill scan
+      const step = 4;
+      for (let y = 15; y < height - 15; y += step) {
+        for (let x = 15; x < width - 15; x += step) {
+          const idx = y * width + x;
+          if (visited[idx] || !isSlotPixel(x, y)) continue;
+
+          // BFS Flood fill
+          const queue = [[x, y]];
+          visited[idx] = 1;
+          let minX = x, maxX = x, minY = y, maxY = y;
+
+          while (queue.length > 0) {
+            const [cx, cy] = queue.shift();
+            if (cx < minX) minX = cx;
+            if (cx > maxX) maxX = cx;
+            if (cy < minY) minY = cy;
+            if (cy > maxY) maxY = cy;
+
+            const dirs = [[0, 2], [0, -2], [2, 0], [-2, 0]]; // step by 2 to speed up flood fill
+            for (const [dx, dy] of dirs) {
+              const nx = cx + dx;
+              const ny = cy + dy;
+              if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                const nidx = ny * width + nx;
+                if (!visited[nidx] && isSlotPixel(nx, ny)) {
+                  visited[nidx] = 1;
+                  queue.push([nx, ny]);
+                }
+              }
+            }
+          }
+
+          const w = maxX - minX;
+          const h = maxY - minY;
+
+          // Filter components based on sizes
+          if (w > 80 && h > 80 && w < width * 0.95 && h < height * 0.95) {
+            components.push({
+              x: minX,
+              y: minY,
+              w: w,
+              h: h,
+              area: w * h
+            });
+          }
+        }
+      }
+
+      // Sort by area desc
+      components.sort((a, b) => b.area - a.area);
+
+      // We want to group components that are overlapping or too close
+      const uniqueComponents = [];
+      for (const comp of components) {
+        let isMerged = false;
+        for (const uniq of uniqueComponents) {
+          // Check intersection/overlap
+          const overlapX = Math.max(0, Math.min(comp.x + comp.w, uniq.x + uniq.w) - Math.max(comp.x, uniq.x));
+          const overlapY = Math.max(0, Math.min(comp.y + comp.h, uniq.y + uniq.h) - Math.max(comp.y, uniq.y));
+          if (overlapX > 20 && overlapY > 20) {
+            isMerged = true;
+            break;
+          }
+        }
+        if (!isMerged) {
+          uniqueComponents.push(comp);
+        }
+      }
+
+      // Slice to exactly the number of slots we want
+      const finalSlots = uniqueComponents.slice(0, count);
+
+      // Sort final slots by layout position (top to bottom, left to right)
+      finalSlots.sort((a, b) => {
+        if (Math.abs(a.y - b.y) < 60) {
+          return a.x - b.x;
+        }
+        return a.y - b.y;
+      });
+
+      return finalSlots;
+    }
+
+    function findSlotsFromSeeds(canvas, seeds, thresholdValue) {
+      const ctx = canvas.getContext("2d");
+      const width = canvas.width;
+      const height = canvas.height;
+      const imgData = ctx.getImageData(0, 0, width, height);
+      const data = imgData.data;
+
+      const visited = new Uint8Array(width * height);
+      const slots = [];
+
+      // Helper to check if pixel is light/bright
+      function isLight(x, y) {
+        if (x < 0 || x >= width || y < 0 || y >= height) return false;
+        const idx = (y * width + x) * 4;
+        const r = data[idx];
+        const g = data[idx + 1];
+        const b = data[idx + 2];
+        const a = data[idx + 3];
+        if (a < 100) return false; // Transparent is not a slot
+        
+        // Average brightness
+        const br = (r + g + b) / 3;
+        return br >= thresholdValue;
+      }
+
+      for (const seed of seeds) {
+        const [sx, sy] = seed;
+        const sidx = sy * width + sx;
+        
+        // If the seed itself is not light, search in a small neighborhood for a light pixel
+        let startX = sx;
+        let startY = sy;
+        if (!isLight(startX, startY)) {
+          let found = false;
+          for (let r = 1; r < 50 && !found; r++) {
+            for (let dx = -r; dx <= r && !found; dx++) {
+              for (let dy = -r; dy <= r && !found; dy++) {
+                if (isLight(sx + dx, sy + dy)) {
+                  startX = sx + dx;
+                  startY = sy + dy;
+                  found = true;
+                }
+              }
+            }
+          }
+        }
+
+        const startIdx = startY * width + startX;
+        if (visited[startIdx] || !isLight(startX, startY)) {
+          // If we still can't find a light pixel, skip or use a default slot size centered on the seed
+          slots.push({
+            x: Math.max(0, sx - 150),
+            y: Math.max(0, sy - 150),
+            w: 300,
+            h: 300,
+            note: "fallback"
+          });
+          continue;
+        }
+
+        // Start BFS flood fill
+        const queue = [[startX, startY]];
+        visited[startIdx] = 1;
+        let minX = startX, maxX = startX, minY = startY, maxY = startY;
+
+        while (queue.length > 0) {
+          const [cx, cy] = queue.shift();
+          if (cx < minX) minX = cx;
+          if (cx > maxX) maxX = cx;
+          if (cy < minY) minY = cy;
+          if (cy > maxY) maxY = cy;
+
+          // Check 4 directions
+          const dirs = [[0,1], [0,-1], [1,0], [-1,0]];
+          for (const [dx, dy] of dirs) {
+            const nx = cx + dx;
+            const ny = cy + dy;
+            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+              const nidx = ny * width + nx;
+              if (!visited[nidx] && isLight(nx, ny)) {
+                visited[nidx] = 1;
+                queue.push([nx, ny]);
+              }
+            }
+          }
+        }
+
+        slots.push({
+          x: minX,
+          y: minY,
+          w: maxX - minX,
+          h: maxY - minY
+        });
+      }
+
+      return slots;
+    }
+
+    function colorDistance(r1, g1, b1, r2, g2, b2) {
+      return Math.sqrt((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2);
+    }
+
+    function floodFillFromClick(canvas, startX, startY, tolerance = 15) {
+      const ctx = canvas.getContext("2d");
+      const width = canvas.width;
+      const height = canvas.height;
+      const imgData = ctx.getImageData(0, 0, width, height);
+      const data = imgData.data;
+
+      const startIdx = (startY * width + startX) * 4;
+      const targetR = data[startIdx];
+      const targetG = data[startIdx + 1];
+      const targetB = data[startIdx + 2];
+
+      const visited = new Uint8Array(width * height);
+      const queue = [[startX, startY]];
+      visited[startY * width + startX] = 1;
+
+      let minX = startX, maxX = startX, minY = startY, maxY = startY;
+
+      while (queue.length > 0) {
+        const [cx, cy] = queue.shift();
+        if (cx < minX) minX = cx;
+        if (cx > maxX) maxX = cx;
+        if (cy < minY) minY = cy;
+        if (cy > maxY) maxY = cy;
+
+        // Check 4 directions (step by 4 for efficiency)
+        const dirs = [[0, 4], [0, -4], [4, 0], [-4, 0]];
+        for (const [dx, dy] of dirs) {
+          const nx = cx + dx;
+          const ny = cy + dy;
+          if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+            const nidx = ny * width + nx;
+            if (!visited[nidx]) {
+              const pixelIdx = nidx * 4;
+              const r = data[pixelIdx];
+              const g = data[pixelIdx + 1];
+              const b = data[pixelIdx + 2];
+              
+              if (colorDistance(r, g, b, targetR, targetG, targetB) < tolerance) {
+                visited[nidx] = 1;
+                queue.push([nx, ny]);
+              }
+            }
+          }
+        }
+      }
+
+      return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+    }
+  </script>
+</body>
+</html>

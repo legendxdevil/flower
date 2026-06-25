@@ -1,192 +1,169 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useTransform, useMotionValue } from "framer-motion";
 import { Icons } from "../../lib/icons";
-import { PaperTexture } from "../UI/PaperTexture";
 
-const PetalIcon = ({ className = "w-4 h-4" }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+const PetalIcon = ({ size = 16 }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size}>
     <path d="M12 2C8 6 4 10 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-4-4-8-8-12zm0 18c-3.3 0-6-2.7-6-6 0-3 3.3-6.5 6-9 2.7 2.5 6 6 6 9 0 3.3-2.7 6-6 6z" />
   </svg>
 );
 
-export const HeroSection = ({ onExplore }) => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-      },
-    },
-  };
+export const HeroSection = ({ onExplore, scrollYProgress }) => {
+  const fallbackProgress = useMotionValue(0);
+  const progress = scrollYProgress ?? fallbackProgress;
 
-  const itemVariants = {
-    hidden: { y: 25, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: "spring", stiffness: 80, damping: 15 },
-    },
-  };
+  // Only parallax the video and blossoms — text stays fully opaque
+  const yVideo        = useTransform(progress, [0, 1], ["0%", "20%"]);
+  const xBlossomLeft  = useTransform(progress, [0, 0.5], ["-80%", "-105%"]);
+  const yBlossomLeft  = useTransform(progress, [0, 0.5], ["-20%", "-35%"]);
+  const xBlossomRight = useTransform(progress, [0, 0.5], ["80%", "105%"]);
+  const yBlossomRight = useTransform(progress, [0, 0.5], ["-20%", "-35%"]);
 
-  // 12 floating petals
-  const floatingPetals = Array.from({ length: 12 });
+  const petals = Array.from({ length: 10 });
 
   return (
-    <PaperTexture 
-      className="relative w-full h-screen bg-brand-cream overflow-hidden"
-      contentClassName="w-full h-full flex items-center justify-center"
+    <div
+      className="relative w-full h-screen overflow-hidden flex items-center justify-center bg-black"
     >
-      {/* Video Background */}
-      <video
+      {/* ── 1. Video background ── */}
+      <motion.video
         src="/hero_bg.mp4"
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-100"
+        style={{ y: yVideo }}
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
       />
-      
-      {/* Background Watercolor Splatters / Paint Bleeds (behind cherry blossoms) */}
-      {/* Top Left Watercolor Splash */}
-      <div 
-        className="absolute top-0 left-0 w-[95%] md:w-[85%] lg:w-[75%] max-w-[1150px] aspect-square pointer-events-none select-none z-0 opacity-80 blur-[40px]"
-        style={{ transform: "translate(-78%, -25%)" }}
+
+      {/* ── 2. Dark scrim — guarantees text contrast ── */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60 pointer-events-none" />
+
+      {/* ── 2b. Subtle white tint overlay at the top for navbar contrast ── */}
+      <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-white/[0.12] via-white/[0.04] to-transparent pointer-events-none z-[1]" />
+
+      {/* ── 3. Watercolor blush blobs (purely decorative) ── */}
+      <div
+        className="absolute top-0 left-0 w-[75%] max-w-[900px] aspect-square pointer-events-none select-none opacity-40 blur-[50px]"
+        style={{ transform: "translate(-60%, -20%)" }}
       >
         <svg viewBox="0 0 500 500" className="w-full h-full fill-brand-pinkBg">
           <path d="M100,50 C240,10 380,80 410,190 C440,300 390,410 290,440 C190,470 70,390 40,280 C10,170 30,80 100,50 Z" />
         </svg>
       </div>
-
-      {/* Top Right Watercolor Splash */}
-      <div 
-        className="absolute top-0 right-0 w-[100%] md:w-[90%] lg:w-[80%] max-w-[1250px] aspect-square pointer-events-none select-none z-0 opacity-80 blur-[40px]"
-        style={{ transform: "translate(78%, -25%)" }}
+      <div
+        className="absolute top-0 right-0 w-[75%] max-w-[900px] aspect-square pointer-events-none select-none opacity-40 blur-[50px]"
+        style={{ transform: "translate(60%, -20%)" }}
       >
         <svg viewBox="0 0 500 500" className="w-full h-full fill-brand-pinkBg">
           <path d="M150,50 C300,10 440,90 420,230 C400,370 290,420 180,380 C70,340 50,210 110,170 C170,130 90,80 150,50 Z" />
         </svg>
       </div>
 
-      {/* Watercolor Cherry Blossom Corner Decorations */}
-      {/* Top Left Cherry Blossoms */}
-      <div 
-        className="absolute top-0 left-0 w-[85%] md:w-[75%] lg:w-[70%] max-w-[1100px] pointer-events-none select-none z-10"
-        style={{ transform: "translate(-80%, -20%)" }}
-      >
-        <img
-          src="/flowers/cherry_blossom_frame.png"
-          alt=""
-          className="w-full h-full object-contain rotate-[-5deg] opacity-95"
-        />
-      </div>
-
-      {/* Top Right Cherry Blossoms */}
-      <div 
-        className="absolute top-0 right-0 w-[92%] md:w-[82%] lg:w-[77%] max-w-[1200px] pointer-events-none select-none z-10"
-        style={{ transform: "translate(80%, -20%)" }}
-      >
-        <img
-          src="/flowers/cherry_blossom_frame.png"
-          alt=""
-          className="w-full h-full object-contain scale-x-[-1] rotate-[5deg] opacity-95"
-        />
-      </div>
-
-      {/* Floating Petals Anim */}
-      {floatingPetals.map((_, index) => {
-        const startX = Math.random() * 100; // % width
-        const duration = 8 + Math.random() * 6; // seconds
-        const delay = Math.random() * 5;
-        const size = 12 + Math.random() * 16; // px
-        
-        return (
-          <motion.div
-            key={index}
-            className="absolute text-brand-rose/25 pointer-events-none z-10"
-            style={{ left: `${startX}%`, top: -50 }}
-            animate={{
-              y: "110vh",
-              x: ["0px", `${Math.sin(index) * 50}px`, "0px"],
-              rotate: [0, 360],
-            }}
-            transition={{
-              duration: duration,
-              repeat: Infinity,
-              delay: delay,
-              ease: "linear",
-            }}
-          >
-            <PetalIcon style={{ width: size, height: size }} />
-          </motion.div>
-        );
-      })}
-
-      {/* Main Content */}
+      {/* ── 4. Cherry blossom frames (parallax outward on scroll) ── */}
       <motion.div
-        className="relative z-30 max-w-4xl px-lg text-center flex flex-col items-center mt-8"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+        className="absolute top-0 left-0 w-[70%] max-w-[1000px] pointer-events-none select-none"
+        style={{ x: xBlossomLeft, y: yBlossomLeft }}
       >
-        {/* Main Title Split: Garden / Dreams */}
-        <div className="flex flex-col items-center select-none">
-          <motion.h1
-            variants={itemVariants}
-            className="font-display text-[6.5rem] sm:text-[9.5rem] md:text-[12rem] lg:text-[14.5rem] xl:text-[16rem] font-medium text-brand-rose leading-[0.8] tracking-tight"
-          >
-            Garden
-          </motion.h1>
-          <motion.h1
-            variants={itemVariants}
-            className="font-display text-[6.5rem] sm:text-[9.5rem] md:text-[12rem] lg:text-[14.5rem] xl:text-[16rem] font-medium text-brand-green leading-[0.9] tracking-tight mt-1"
-          >
-            Dreams
-          </motion.h1>
-        </div>
+        <img
+          src="/flowers/cherry_blossom_frame.png"
+          alt=""
+          className="w-full h-full object-contain rotate-[-5deg]"
+        />
+      </motion.div>
+      <motion.div
+        className="absolute top-0 right-0 w-[75%] max-w-[1050px] pointer-events-none select-none"
+        style={{ x: xBlossomRight, y: yBlossomRight }}
+      >
+        <img
+          src="/flowers/cherry_blossom_frame.png"
+          alt=""
+          className="w-full h-full object-contain scale-x-[-1] rotate-[5deg]"
+        />
+      </motion.div>
+
+      {/* ── 5. Floating petals ── */}
+      {petals.map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute text-brand-rose/30 pointer-events-none"
+          style={{ left: `${8 + i * 9}%`, top: -30 }}
+          animate={{ y: "110vh", x: [`0px`, `${Math.sin(i) * 40}px`, `0px`], rotate: [0, 360] }}
+          transition={{ duration: 9 + i * 0.7, repeat: Infinity, delay: i * 0.5, ease: "linear" }}
+        >
+          <PetalIcon size={14 + (i % 4) * 5} />
+        </motion.div>
+      ))}
+
+      {/* ── 6. Hero text — always visible, no scroll-driven opacity ── */}
+      <motion.div
+        className="relative z-10 max-w-5xl px-6 text-center flex flex-col items-center"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, ease: "easeOut", delay: 0.2 }}
+      >
+        {/* "Garden" */}
+        <motion.h1
+          className="font-display font-medium text-white leading-[0.85] tracking-tight select-none"
+          style={{
+            fontSize: "clamp(5rem, 14vw, 16rem)",
+            textShadow: "0 2px 20px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4)",
+          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.35 }}
+        >
+          Garden
+        </motion.h1>
+
+        {/* "Dreams" */}
+        <motion.h1
+          className="font-display font-medium text-brand-pinkBg leading-[0.9] tracking-tight select-none mt-1"
+          style={{
+            fontSize: "clamp(5rem, 14vw, 16rem)",
+            textShadow: "0 2px 20px rgba(0,0,0,0.45), 0 1px 4px rgba(0,0,0,0.3)",
+          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          Dreams
+        </motion.h1>
 
         {/* Subtitle */}
         <motion.p
-          variants={itemVariants}
-          className="font-mustasurma text-[22px] sm:text-[26px] text-brand-rose/95 mt-6 normal-case max-w-xl leading-relaxed"
+          className="font-mustasurma text-white/90 mt-5 normal-case max-w-lg leading-relaxed"
+          style={{
+            fontSize: "clamp(1.1rem, 2vw, 1.6rem)",
+            textShadow: "0 1px 8px rgba(0,0,0,0.7)",
+          }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.65 }}
         >
           Made on Earth, designed with you in mind.
         </motion.p>
 
-        {/* CTA Buttons (MORE, SHOP) */}
+        {/* Scroll hint */}
         <motion.div
-          variants={itemVariants}
-          className="flex gap-md mt-10 flex-row"
-        >
-          <motion.button
-            onClick={onExplore}
-            className="px-8 py-3 bg-brand-rose border border-brand-rose text-white font-ui font-bold text-[11px] tracking-[0.2em] rounded-full shadow-soft hover:shadow-hover hover:bg-brand-rose/95 hover:scale-[1.03] active:scale-[0.98] transition-all duration-300"
-          >
-            MORE
-          </motion.button>
-          
-          <motion.button
-            onClick={onExplore}
-            className="px-8 py-3 bg-transparent border border-brand-rose text-brand-rose font-ui font-bold text-[11px] tracking-[0.2em] rounded-full hover:bg-brand-pink-bg/25 hover:scale-[1.03] active:scale-[0.98] transition-all duration-300"
-          >
-            SHOP
-          </motion.button>
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          className="absolute -bottom-24 md:-bottom-28 flex flex-col items-center cursor-pointer opacity-70 hover:opacity-100 transition-opacity z-30"
+          className="mt-14 flex flex-col items-center gap-1 cursor-pointer opacity-60 hover:opacity-90 transition-opacity"
           onClick={onExplore}
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.65, y: [0, 7, 0] }}
+          transition={{
+            opacity: { delay: 1.2, duration: 0.6 },
+            y: { duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1.4 },
+          }}
         >
-          <span className="font-ui text-[10px] tracking-[0.2em] uppercase text-brand-rose/60 mb-sm">
+          <span
+            className="font-ui text-[10px] tracking-[0.25em] uppercase text-white/80"
+            style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}
+          >
             Scroll to explore
           </span>
-          <Icons.ChevronDown className="w-5 h-5 text-brand-rose/80" />
+          <Icons.ChevronDown className="w-5 h-5 text-white/80" />
         </motion.div>
       </motion.div>
-    </PaperTexture>
+    </div>
   );
 };

@@ -149,10 +149,10 @@ export const FavoritesSidebar = ({ isOpen, onClose }) => {
                   {favoriteFlowers.length > 0 && (
                     <div className="bg-pink-rose/5 border border-pink-rose/20 rounded-xl p-3 mb-4 text-center shadow-sm">
                       <p className="text-[11px] font-bold text-pink-rose uppercase tracking-[0.2em] leading-tight">
-                        ✨ 4 images kar must for collage! ✨
+                        ✨ 1 to 7 favorites for collage! ✨
                       </p>
                       <p className="text-[9px] text-brown-dark/40 font-ui mt-1 italic">
-                        Select your favorite quartet for the perfect mix
+                        Choose up to 7 favorites to generate a custom template collage
                       </p>
                     </div>
                   )}

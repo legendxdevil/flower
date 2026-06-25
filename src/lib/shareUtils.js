@@ -144,84 +144,133 @@ export const generateShareCard = async (flower) => {
 };
 
 export const generateCollageCard = async (flowers) => {
-  return new Promise((resolve) => {
+  const COLLAGE_COORDINATES = {
+    1: [
+      { x: 55, y: 343, w: 554, h: 550 }
+    ],
+    2: [
+      { x: 169, y: 245, w: 398, h: 286 },
+      { x: 195, y: 745, w: 414, h: 278 }
+    ],
+    3: [
+      { x: 19, y: 51, w: 698, h: 324 },
+      { x: 21, y: 463, w: 694, h: 334 },
+      { x: 19, y: 905, w: 698, h: 322 }
+    ],
+    4: [
+      { x: 99, y: 309, w: 236, h: 234 },
+      { x: 424, y: 423, w: 236, h: 234 },
+      { x: 110, y: 674, w: 236, h: 234 },
+      { x: 391, y: 865, w: 236, h: 234 }
+    ],
+    5: [
+      { x: 159, y: 105, w: 314, h: 234 },
+      { x: 303, y: 439, w: 278, h: 212 },
+      { x: 83, y: 721, w: 246, h: 184 },
+      { x: 449, y: 765, w: 216, h: 290 },
+      { x: 59, y: 1025, w: 236, h: 176 }
+    ],
+    6: [
+      { x: 65, y: 261, w: 252, h: 250 },
+      { x: 425, y: 237, w: 252, h: 250 },
+      { x: 43, y: 567, w: 250, h: 252 },
+      { x: 341, y: 537, w: 256, h: 254 },
+      { x: 135, y: 839, w: 270, h: 268 },
+      { x: 453, y: 877, w: 248, h: 250 }
+    ],
+    7: [
+      { x: 11, y: 89, w: 308, h: 306 },
+      { x: 422, y: 92, w: 296, h: 276 },
+      { x: 27, y: 417, w: 316, h: 314 },
+      { x: 429, y: 397, w: 298, h: 294 },
+      { x: 1, y: 771, w: 296, h: 294 },
+      { x: 429, y: 721, w: 304, h: 302 },
+      { x: 224, y: 990, w: 288, h: 244 }
+    ]
+  };
+
+  const count = Math.min(flowers.length, 7);
+  if (count === 0) return null;
+
+  return new Promise((resolve, reject) => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-    
-    // Limits and Grid setup
-    const count = Math.min(flowers.length, 4); // Limit to 4 for best 2x2 collage
-    const cols = count > 1 ? 2 : 1;
-    const rows = Math.ceil(count / cols);
-    
-    canvas.width = 1200;
-    canvas.height = 1200;
-    
-    // Background
-    ctx.fillStyle = "#2C1810"; // brown-dark
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    const cellW = canvas.width / cols;
-    const cellH = canvas.height / rows;
-    
-    let loadedCount = 0;
-    
-    flowers.slice(0, count).forEach((flower, index) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = flower.imageUrl;
-      
-      img.onload = () => {
-        const col = index % cols;
-        const row = Math.floor(index / cols);
-        const startX = col * cellW;
-        const startY = row * cellH;
-        
-        // Draw Image (Cover cell)
-        const scale = Math.max(cellW / img.width, cellH / img.height);
-        const x = startX + (cellW / 2) - (img.width / 2) * scale;
-        const y = startY + (cellH / 2) - (img.height / 2) * scale;
-        
-        // Clip to cell
+
+    const templateImg = new Image();
+    templateImg.crossOrigin = "anonymous";
+    templateImg.src = `/Collage/${count} images.jpg`;
+
+    templateImg.onload = async () => {
+      canvas.width = templateImg.naturalWidth || templateImg.width;
+      canvas.height = templateImg.naturalHeight || templateImg.height;
+
+      // Draw background template
+      ctx.drawImage(templateImg, 0, 0);
+
+      const slots = COLLAGE_COORDINATES[count];
+      if (!slots) {
+        resolve(canvas.toDataURL("image/jpeg", 0.9));
+        return;
+      }
+
+      // Load all flower images
+      const flowerLoadPromises = flowers.slice(0, count).map((flower) => {
+        return new Promise((res) => {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.src = flower.imageUrl;
+          img.onload = () => res(img);
+          img.onerror = () => {
+            console.error(`Failed to load image for flower: ${flower.name}`);
+            res(null); // resolve with null so others can still load
+          };
+        });
+      });
+
+      const loadedImgs = await Promise.all(flowerLoadPromises);
+
+      // Draw each loaded image centered in its slot, maximized to fill the slot, and slightly tilted
+      loadedImgs.forEach((img, index) => {
+        if (!img) return; // skip if image failed to load
+        const s = slots[index];
+        if (!s) return;
+
+        // Subtle hand-crafted polaroid tilt angles (alternating between ~2 to ~3 degrees)
+        const angle = [0.04, -0.05, 0.03, -0.04, 0.05, -0.03, 0.04][index % 7];
+        const cos = Math.abs(Math.cos(angle));
+        const sin = Math.abs(Math.sin(angle));
+
+        // Get base contain dimensions (fill the square as much as possible)
+        const baseScale = Math.min(s.w / img.width, s.h / img.height);
+        const baseW = img.width * baseScale;
+        const baseH = img.height * baseScale;
+
+        // Calculate the bounding box size of the rotated image
+        const rotW = baseW * cos + baseH * sin;
+        const rotH = baseW * sin + baseH * cos;
+
+        // Scale down just enough so the rotated corners do not exceed the slot frame
+        const fitFactor = Math.min(s.w / rotW, s.h / rotH);
+        const drawW = baseW * fitFactor;
+        const drawH = baseH * fitFactor;
+
+        // Draw rotated image centered inside the slot frame
+        const centerX = s.x + s.w / 2;
+        const centerY = s.y + s.h / 2;
+
         ctx.save();
-        ctx.beginPath();
-        ctx.rect(startX, startY, cellW, cellH);
-        ctx.clip();
-        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-        
-        // Inner Overlay/Border
-        ctx.strokeStyle = "rgba(255,249,241,0.2)";
-        ctx.lineWidth = 10;
-        ctx.strokeRect(startX, startY, cellW, cellH);
-        
-        // Flower Name Badge
-        ctx.fillStyle = "rgba(44,24,16,0.7)"; // shadow
-        ctx.font = "bold 24px 'Playfair Display', serif";
-        ctx.textAlign = "right";
-        ctx.fillText(flower.name, startX + cellW - 20, startY + cellH - 35);
-        ctx.fillStyle = "#E75480"; // pink-rose
-        ctx.fillText(flower.name, startX + cellW - 20, startY + cellH - 40);
-        
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angle);
+        ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
         ctx.restore();
-        
-        loadedCount++;
-        if (loadedCount === count) {
-          // Final Polish
-          // Add Center Logo/Branding
-          ctx.font = "bold 40px 'Playfair Display', serif";
-          ctx.fillStyle = "#FFF9F1";
-          ctx.textAlign = "center";
-          ctx.shadowBlur = 20;
-          ctx.shadowColor = "rgba(0,0,0,0.5)";
-          ctx.fillText("MY FLORIN FAVORITES", canvas.width / 2, canvas.height / 2 + 15);
-          
-          resolve(canvas.toDataURL("image/jpeg", 0.9));
-        }
-      };
-      
-      img.onerror = () => {
-        loadedCount++;
-        if (loadedCount === count) resolve(canvas.toDataURL("image/jpeg", 0.9));
-      };
-    });
+      });
+
+      resolve(canvas.toDataURL("image/jpeg", 0.9));
+    };
+
+    templateImg.onerror = () => {
+      console.error(`Failed to load collage template: ${count} images.jpg`);
+      reject(new Error(`Failed to load template ${count} images.jpg`));
+    };
   });
 };

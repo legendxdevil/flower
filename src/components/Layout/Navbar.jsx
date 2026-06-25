@@ -1,202 +1,227 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Icons } from "../../lib/icons";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { useFavorites } from "../../hooks/useFavorites";
-import { GlassButton } from "../UI/apple-tahoe-liquid-glass-button";
 
-const FlowerLogoIcon = ({ className = "w-5 h-5" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className={className} fill="none" stroke="currentColor" strokeWidth="4">
-    <circle cx="50" cy="50" r="10" fill="currentColor" />
-    <path d="M50,18 C42,26 38,36 50,36 C62,36 58,26 50,18 Z" fill="none" />
-    <path d="M50,82 C42,74 38,64 50,64 C62,64 58,74 50,82 Z" fill="none" />
-    <path d="M18,50 C26,42 36,38 36,50 C36,62 26,58 18,50 Z" fill="none" />
-    <path d="M82,50 C74,42 64,38 64,50 C64,62 74,58 82,50 Z" fill="none" />
-    <path d="M27,27 C35,35 42,30 42,42 C30,42 35,35 27,27 Z" fill="none" />
-    <path d="M73,73 C65,65 58,70 58,58 C70,58 65,65 73,73 Z" fill="none" />
-    <path d="M27,73 C35,65 42,70 42,58 C30,58 35,65 27,73 Z" fill="none" />
-    <path d="M73,27 C65,35 58,30 58,42 C70,42 65,35 73,27 Z" fill="none" />
+/* ─── Inline SVG Icons ─── */
+const HomeIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    <polyline points="9 22 9 12 15 12 15 22" />
+  </svg>
+);
+const UserIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+const CompassIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+  </svg>
+);
+const HeartIcon = ({ filled }) => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.72-8.72 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
   </svg>
 );
 
-const SettingsIcon = ({ className = "w-4 h-4" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+/* ─── SVG Glass distortion filter (matches reference exactly) ─── */
+const GlassFilter = () => (
+  <svg style={{ display: "none", position: "absolute" }} aria-hidden="true">
+    <defs>
+      <filter id="nav-glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
+        <feTurbulence type="fractalNoise" baseFrequency="0.001 0.005" numOctaves="1" seed="17" result="turbulence" />
+        <feComponentTransfer in="turbulence" result="mapped">
+          <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
+          <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
+          <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+        </feComponentTransfer>
+        <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+        <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100" lightingColor="white" result="specLight">
+          <fePointLight x="-200" y="-200" z="300" />
+        </feSpecularLighting>
+        <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
+        <feDisplacementMap in="SourceGraphic" in2="softMap" scale="200" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
   </svg>
 );
 
-const BasketIcon = ({ className = "w-4 h-4" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-  </svg>
+/* ─── Glass pill wrapper ─── */
+const GlassPill = ({ children }) => (
+  <div
+    className="relative flex rounded-full"
+    style={{
+      boxShadow: "0 6px 24px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.35)",
+      transition: "all 0.5s cubic-bezier(0.175, 0.885, 0.32, 2.2)",
+    }}
+  >
+    {/* Layer 1 — backdrop blur + distortion */}
+    <div
+      className="absolute inset-0 rounded-full overflow-hidden"
+      style={{
+        backdropFilter: "blur(16px) saturate(180%)",
+        WebkitBackdropFilter: "blur(16px) saturate(180%)",
+        filter: "url(#nav-glass-distortion)",
+        isolation: "isolate",
+      }}
+    />
+    {/* Layer 2 — translucent white fill */}
+    <div
+      className="absolute inset-0 rounded-full"
+      style={{ background: "rgba(255,255,255,0.22)" }}
+    />
+    {/* Layer 3 — inner highlight rim */}
+    <div
+      className="absolute inset-0 rounded-full"
+      style={{
+        boxShadow:
+          "inset 2px 2px 1px rgba(255,255,255,0.55), inset -1px -1px 1px rgba(255,255,255,0.4)",
+      }}
+    />
+    {/* Content */}
+    <div className="relative z-10">{children}</div>
+  </div>
 );
 
-const navItems = [
-  { id: "home", label: "Home" },
-  { id: "about", label: "About" },
-  { id: "products", label: "Shop" },
-  { id: "contact", label: "Contact" },
+/* ─── Nav items ─── */
+const NAV_ITEMS = [
+  { id: "home",    label: "Home",    icon: <HomeIcon />,    targetId: null },
+  { id: "about",   label: "About",   icon: <UserIcon />,    targetId: "story-section" },
+  { id: "explore", label: "Explore", icon: <CompassIcon />, targetId: "best-sellers-section" },
 ];
 
 export const Navbar = ({ onFavoritesClick }) => {
-  const [showSettingsAlert, setShowSettingsAlert] = useState(false);
-  const [activeItem, setActiveItem] = useState("home");
+  const [active, setActive] = useState("home");
   const favorites = useFavorites((state) => state.favorites);
   const favoriteCount = favorites.length;
 
-  const scrollToSection = (id) => {
-    setActiveItem(id);
+  React.useEffect(() => {
     const container = document.getElementById("root-snap-container");
-    if (id === "home") {
-      if (container) {
-        container.scrollTo({ top: 0, behavior: "smooth" });
-      } else {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-    } else if (id === "products") {
-      const el = document.getElementById("best-sellers-section");
-      if (el) el.scrollIntoView({ behavior: "smooth" });
-    } else if (id === "about" || id === "contact") {
-      const el = document.getElementById("footer-section");
-      if (el) el.scrollIntoView({ behavior: "smooth" });
+    if (!container) return;
+
+    const observerOptions = {
+      root: container,
+      rootMargin: "-45% 0px -45% 0px",
+      threshold: 0,
+    };
+
+    const observerCallback = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          if (entry.target.id === "hero-section") {
+            setActive("home");
+          } else if (entry.target.id === "story-section") {
+            setActive("about");
+          } else if (entry.target.id === "best-sellers-section") {
+            setActive("explore");
+          }
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    const hero = document.getElementById("hero-section");
+    const story = document.getElementById("story-section");
+    const explore = document.getElementById("best-sellers-section");
+
+    if (hero) observer.observe(hero);
+    if (story) observer.observe(story);
+    if (explore) observer.observe(explore);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const scrollTo = (item) => {
+    setActive(item.id);
+    const container = document.getElementById("root-snap-container");
+
+    if (!item.targetId) {
+      // Home — scroll to very top
+      if (container) container.scrollTo({ top: 0, behavior: "smooth" });
+      else window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const el = document.getElementById(item.targetId);
+    if (!el) return;
+
+    if (container) {
+      container.scrollTo({ top: el.offsetTop, behavior: "smooth" });
+    } else {
+      el.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-
-  // CSS variables for the glass effect to work with the color theme
-  useEffect(() => {
-    document.documentElement.style.setProperty("--foreground", "21 23 14");
-    document.documentElement.style.setProperty("--background", "249 240 235");
-  }, []);
-
   return (
     <>
-      {/* ─── Floating Bottom Glass Dock ─── */}
-      <style>{`
-        .glass-dock {
-          background: rgba(255, 243, 240, 0.18);
-          backdrop-filter: blur(20px) saturate(180%);
-          -webkit-backdrop-filter: blur(20px) saturate(180%);
-          border: 1px solid rgba(193, 71, 86, 0.18);
-          box-shadow:
-            0 8px 32px rgba(193, 71, 86, 0.12),
-            0 2px 8px rgba(0,0,0,0.08),
-            inset 0 1px 0 rgba(255,255,255,0.6),
-            inset 0 -1px 0 rgba(193, 71, 86, 0.08);
-        }
-        .glass-dock-divider {
-          width: 1px;
-          height: 28px;
-          background: linear-gradient(to bottom, transparent, rgba(193, 71, 86, 0.2), transparent);
-          flex-shrink: 0;
-        }
-        .nav-btn-active .btn-liquid-lens {
-          background-color: rgba(193, 71, 86, 0.15) !important;
-        }
-        :root {
-          --foreground: 21 23 14;
-          --background: 249 240 235;
-        }
-      `}</style>
+      <GlassFilter />
 
       <motion.div
-        className="fixed bottom-6 left-1/2 z-50"
+        className="fixed top-5 left-1/2 z-50"
         style={{ x: "-50%" }}
-        initial={{ y: 100, opacity: 0 }}
+        initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 200, damping: 28, delay: 0.3 }}
+        transition={{ type: "spring", stiffness: 220, damping: 26, delay: 0.2 }}
       >
-        <div className="glass-dock rounded-full px-3 py-2 flex items-center gap-1">
+        <GlassPill>
+          <div className="flex items-center gap-1.5 px-2 py-2">
 
-          {/* ── Logo mark ── */}
-          <button
-            onClick={() => scrollToSection("home")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full group transition-all duration-300 hover:bg-brand-rose/10 active:scale-95"
-          >
-            <FlowerLogoIcon
-              className="w-5 h-5 text-brand-rose group-hover:rotate-45 transition-transform duration-500"
-            />
-            <span className="hidden sm:inline font-display text-sm tracking-[0.25em] font-semibold text-brand-green uppercase select-none">
-              Florin
-            </span>
-          </button>
+            {/* Nav items */}
+            {NAV_ITEMS.map((item) => {
+              const isActive = active === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => scrollTo(item)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full font-ui font-semibold text-[12px] tracking-[0.08em] uppercase transition-all duration-500 cursor-pointer"
+                  style={{
+                    background: isActive ? "#c14756" : "rgba(255,255,255,0.08)",
+                    color: isActive ? "#ffffff" : "rgba(95,108,64,0.85)",
+                    transitionTimingFunction: "cubic-bezier(0.175, 0.885, 0.32, 2.2)",
+                    transform: isActive ? "scale(1.04)" : "scale(1)",
+                  }}
+                >
+                  <span style={{ opacity: isActive ? 1 : 0.7 }}>{item.icon}</span>
+                  <span className="hidden sm:inline">{item.label}</span>
+                </button>
+              );
+            })}
 
-          <div className="glass-dock-divider" />
+            {/* Divider */}
+            <div className="w-px h-6 mx-1 bg-brand-rose/20 shrink-0" />
 
-          {/* ── Nav Items ── */}
-          {navItems.map((item) => (
-            <GlassButton
-              key={item.id}
-              size="sm"
-              onClick={() => scrollToSection(item.id)}
-              className={`font-ui text-[11px] tracking-[0.12em] uppercase font-semibold transition-all ${
-                activeItem === item.id
-                  ? "text-brand-rose nav-btn-active"
-                  : "text-brand-rose/70 hover:text-brand-rose"
-              }`}
-              glassColor={
-                activeItem === item.id
-                  ? "rgba(193, 71, 86, 0.12)"
-                  : "rgba(255, 255, 255, 0.05)"
-              }
+            {/* Favorites heart button */}
+            <button
+              onClick={onFavoritesClick}
+              className="relative flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 cursor-pointer"
+              style={{
+                background: favoriteCount > 0 ? "rgba(193,71,86,0.12)" : "rgba(255,255,255,0.08)",
+                color: "#c14756",
+              }}
+              title="Favorites"
             >
-              {item.label}
-            </GlassButton>
-          ))}
+              <HeartIcon filled={favoriteCount > 0} />
+              {favoriteCount > 0 && (
+                <motion.span
+                  className="absolute top-0.5 right-0.5 bg-brand-rose text-white text-[9px] font-bold rounded-full min-w-[16px] h-[16px] px-1 flex items-center justify-center leading-none pointer-events-none"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  {favoriteCount}
+                </motion.span>
+              )}
+            </button>
 
-          <div className="glass-dock-divider" />
-
-          {/* ── Action Icons ── */}
-          <GlassButton
-            size="icon"
-            onClick={() => {
-              setShowSettingsAlert(true);
-              setTimeout(() => setShowSettingsAlert(false), 3000);
-            }}
-            className="text-brand-rose/70 hover:text-brand-rose w-9 h-9"
-            glassColor="rgba(255, 255, 255, 0.05)"
-            title="Settings"
-          >
-            <SettingsIcon className="w-4 h-4" />
-          </GlassButton>
-
-          <GlassButton
-            size="icon"
-            onClick={onFavoritesClick}
-            className="text-brand-rose/70 hover:text-brand-rose w-9 h-9 relative"
-            glassColor="rgba(255, 255, 255, 0.05)"
-            title="Favorites"
-          >
-            <BasketIcon className="w-4 h-4" />
-            {favoriteCount > 0 && (
-              <motion.span
-                className="absolute -top-1.5 -right-1.5 bg-brand-rose text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center pointer-events-none z-20 shadow-sm"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                {favoriteCount}
-              </motion.span>
-            )}
-          </GlassButton>
-
-        </div>
+          </div>
+        </GlassPill>
       </motion.div>
-
-      {/* ─── Settings Toast ─── */}
-      <AnimatePresence>
-        {showSettingsAlert && (
-          <motion.div
-            initial={{ opacity: 0, y: 80 }}
-            animate={{ opacity: 0.95, y: 0 }}
-            exit={{ opacity: 0, y: 80 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] bg-white/90 backdrop-blur-md shadow-card border border-brand-rose/20 px-5 py-2.5 rounded-full text-brand-rose font-ui text-sm font-semibold"
-          >
-            ⚙️ Settings customization coming soon!
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 };

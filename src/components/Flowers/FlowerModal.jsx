@@ -5,11 +5,21 @@ import { PaperTexture } from "../UI/PaperTexture";
 import { SharePreviewModal } from "../UI/SharePreviewModal";
 import { shareContent, getSocialShareLinks, copyToClipboard, generateInstagramCaption, generateShareCard, downloadImage } from "../../lib/shareUtils";
 
-export const FlowerModal = ({ flower, isOpen, onClose, isFavorite, onFavoriteToggle }) => {
+export const FlowerModal = ({ flower: propFlower, isOpen, onClose, isFavorite, onFavoriteToggle }) => {
   const [showShareFallback, setShowShareFallback] = useState(false);
   const [copied, setCopied] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [activeFlower, setActiveFlower] = useState(null);
+
+  // Sync propFlower to activeFlower state
+  React.useEffect(() => {
+    if (propFlower) {
+      setActiveFlower(propFlower);
+    }
+  }, [propFlower]);
+
+  const flower = propFlower || activeFlower;
 
   if (!flower) return null;
 
@@ -49,7 +59,7 @@ export const FlowerModal = ({ flower, isOpen, onClose, isFavorite, onFavoriteTog
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isOpen && flower && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-8">
           {/* Backdrop */}
           <motion.div
@@ -63,9 +73,9 @@ export const FlowerModal = ({ flower, isOpen, onClose, isFavorite, onFavoriteTog
           {/* Modal Container */}
           <motion.div
             className="relative w-full max-w-5xl max-h-[90vh] bg-white rounded-[2.5rem] shadow-deep overflow-hidden flex flex-col md:flex-row border border-brand-rose/10"
-            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            initial={{ scale: 0.9, opacity: 0, y: 30 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            exit={{ scale: 0.9, opacity: 0, y: 30 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
           >
             {/* Close Button */}
@@ -77,7 +87,13 @@ export const FlowerModal = ({ flower, isOpen, onClose, isFavorite, onFavoriteTog
             </button>
 
             {/* Left Session: High-res Image */}
-            <div className="w-full md:w-1/2 h-64 md:h-auto relative overflow-hidden bg-brand-pinkBg/30 flex items-center justify-center p-8">
+            <motion.div
+              className="w-full md:w-1/2 h-64 md:h-auto relative overflow-hidden bg-brand-pinkBg/30 flex items-center justify-center p-8"
+              initial={{ x: -60, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -60, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 220, damping: 24, delay: 0.05 }}
+            >
               <div className="absolute w-[80%] h-[80%] rounded-full bg-white/50 z-0" />
               <motion.img
                 src={flower.imageUrl}
@@ -97,11 +113,17 @@ export const FlowerModal = ({ flower, isOpen, onClose, isFavorite, onFavoriteTog
                   </span>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Right Session: Content */}
             <PaperTexture className="w-full md:w-1/2 flex flex-col overflow-y-auto custom-scrollbar bg-brand-cream/10">
-              <div className="p-8 lg:p-12 flex-1">
+              <motion.div
+                className="p-8 lg:p-12 flex-1 flex flex-col"
+                initial={{ x: 60, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 60, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 220, damping: 24, delay: 0.05 }}
+              >
                 {/* Header */}
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
@@ -230,7 +252,7 @@ export const FlowerModal = ({ flower, isOpen, onClose, isFavorite, onFavoriteTog
                     </AnimatePresence>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </PaperTexture>
           </motion.div>
           

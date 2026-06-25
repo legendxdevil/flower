@@ -21,7 +21,7 @@ export const SharePreviewModal = ({ isOpen, onClose, image, title, onDownload, s
 
           {/* Modal Container */}
           <motion.div
-            className="relative w-full max-w-2xl bg-accent-cream rounded-3xl shadow-deep overflow-hidden flex flex-col border-2 border-brown-light/30"
+            className="relative w-full max-w-2xl max-h-[90vh] bg-accent-cream rounded-3xl shadow-deep overflow-hidden flex flex-col border-2 border-brown-light/30"
             initial={{ scale: 0.9, opacity: 0, y: 40 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 40 }}
@@ -42,24 +42,24 @@ export const SharePreviewModal = ({ isOpen, onClose, image, title, onDownload, s
             </div>
 
             {/* Preview Image Area */}
-            <div className="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center bg-brown-light/5">
-              <div className="relative group max-w-sm w-full bg-white p-3 shadow-deep rounded-sm border border-brown-light/10">
+            <div className="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center bg-brown-light/5 min-h-0">
+              <div className="relative group max-w-[280px] sm:max-w-sm max-h-[42vh] w-auto h-auto bg-white p-3 shadow-deep rounded-sm border border-brown-light/10 flex items-center justify-center overflow-hidden">
                 <img 
                   src={image} 
                   alt="Share Preview" 
-                  className="w-full h-auto rounded-xs shadow-soft"
+                  className="max-w-full max-h-[38vh] w-auto h-auto object-contain rounded-xs shadow-soft"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors pointer-events-none" />
               </div>
               
-              <p className="mt-6 font-body text-sm text-brown-dark text-center px-8 italic">
+              <p className="mt-4 font-body text-xs sm:text-sm text-brown-dark text-center px-8 italic">
                 "Beautifully captured at Florin - Indian Flowers of Romance"
               </p>
             </div>
 
             {/* Action Footer */}
-            <PaperTexture className="p-8 border-t border-brown-light/20 bg-white/60">
-              <div className="grid grid-cols-2 gap-4 mb-6">
+            <PaperTexture className="p-6 border-t border-brown-light/20 bg-white/60">
+              <div className="grid grid-cols-2 gap-4 mb-4">
                 <button
                   onClick={onDownload}
                   className="py-3 px-6 bg-brown-dark text-white rounded-xl font-ui font-semibold flex items-center justify-center gap-3 hover:bg-brown-earth transition-all shadow-md cursor-pointer"
