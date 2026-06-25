@@ -66,7 +66,7 @@ export const HeroSection = ({ onExplore, scrollYProgress }) => {
         style={{ x: xBlossomLeft, y: yBlossomLeft }}
       >
         <img
-          src="/flowers/cherry_blossom_frame.png"
+          src="/flowers/cherry_blossom_frame.webp"
           alt=""
           className="w-full h-full object-contain rotate-[-5deg]"
         />
@@ -76,7 +76,7 @@ export const HeroSection = ({ onExplore, scrollYProgress }) => {
         style={{ x: xBlossomRight, y: yBlossomRight }}
       >
         <img
-          src="/flowers/cherry_blossom_frame.png"
+          src="/flowers/cherry_blossom_frame.webp"
           alt=""
           className="w-full h-full object-contain scale-x-[-1] rotate-[5deg]"
         />

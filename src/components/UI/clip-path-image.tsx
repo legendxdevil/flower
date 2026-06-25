@@ -72,6 +72,7 @@ const ClippedMediaGallery = React.forwardRef<HTMLElement, ClippedMediaGalleryPro
                 <img
                   src={item.src}
                   alt={item.alt}
+                  loading="lazy"
                   className='transition-all duration-300 aspect-[4/6] min-h-full align-bottom object-cover hover:scale-105 w-full'
                 />
               ) : (

@@ -52,6 +52,7 @@ export const FlowerCard = ({
         <motion.img
           src={imageUrl}
           alt={designerTitle || name}
+          loading="lazy"
           className="w-full h-auto object-cover transition-all duration-500 group-hover:scale-[1.05] drop-shadow-sm"
           style={{ display: "block" }}
         />
