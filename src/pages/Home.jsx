@@ -11,7 +11,7 @@ import { flowers } from "../lib/flowers";
 import { useFavorites } from "../hooks/useFavorites";
 import { ButterflyOverlay } from "../components/UI/ButterflyOverlay";
 import { motion } from "framer-motion";
-import ClippedMediaGallery from "../components/ui/clip-path-image";
+import ClippedMediaGallery from "../components/UI/clip-path-image";
 
 
 

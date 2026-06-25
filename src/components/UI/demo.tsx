@@ -1,4 +1,4 @@
-import ClippedMediaGallery from '@/components/ui/clip-path-image';
+import ClippedMediaGallery from '@/components/UI/clip-path-image';
 import React from 'react';
 
 const ClippedMediaGalleryDemo: React.FC = () => {
