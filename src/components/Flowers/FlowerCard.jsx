@@ -1,57 +1,47 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { Icons } from "../../lib/icons";
 
 export const FlowerCard = ({
   id,
   name,
-  romanticMessage,
   imageUrl,
   meaning,
   season,
   isFavorite,
   onFavoriteClick,
   onClick,
+  category,
+  categoryLabel,
+  designerTitle,
+  price,
+  originalPrice,
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
     <motion.div
-      className="h-full rounded-2xl overflow-hidden bg-white shadow-soft hover:shadow-hover border border-brown-light/20 transition-all cursor-pointer group flex flex-col"
-      whileHover={{ y: -10, scale: 1.02 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="flex flex-col items-center cursor-pointer group select-none py-4"
       onClick={onClick}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ duration: 0.5 }}
     >
-      {/* Image Container */}
-      <div className="relative h-64 overflow-hidden bg-gradient-to-br from-pink-light to-brown-light">
+      {/* Visual Image Area with Circular Backdrop */}
+      <div className="relative w-full aspect-square max-w-[240px] flex items-center justify-center mb-5">
+        
+        {/* Soft Pink Circle Backdrop (Layered behind) */}
+        <div className="absolute w-[72%] h-[72%] rounded-full bg-brand-pinkBg z-0 transition-all duration-500 group-hover:scale-105 group-hover:bg-brand-pinkBg/90 shadow-sm" />
+
+        {/* Flower Bouquet Image */}
         <motion.img
           src={imageUrl}
-          alt={name}
-          className="w-full h-full object-cover"
-          animate={{ scale: isHovered ? 1.1 : 1 }}
-          transition={{ duration: 0.4 }}
+          alt={designerTitle || name}
+          className="w-[85%] h-[85%] object-contain z-10 transition-all duration-500 group-hover:translate-y-[-8px] group-hover:scale-[1.04]"
         />
 
-        {/* Overlay on Hover */}
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-t from-pink-rose/40 to-transparent pointer-events-none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isHovered ? 1 : 0 }}
-          transition={{ duration: 0.3 }}
-        />
-
-        {/* Season Badge */}
-        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-md py-sm rounded-full pointer-events-none">
-          <span className="font-ui text-xs font-semibold text-brown-dark">
-            {season}
-          </span>
-        </div>
-
-        {/* Favorite Button */}
+        {/* Favorite Heart Button - positioned at the top-right edge of the circle backdrop */}
         <motion.button
-          className="absolute top-3 right-3 p-md bg-white/90 backdrop-blur-sm rounded-full hover:bg-pink-rose transition-colors"
+          className="absolute top-[14%] right-[14%] z-20 p-2 bg-white shadow-soft rounded-full text-brand-rose border border-brand-rose/10 hover:bg-brand-pinkBg/50 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             onFavoriteClick(id);
@@ -60,49 +50,36 @@ export const FlowerCard = ({
           whileTap={{ scale: 0.95 }}
         >
           <Icons.Heart
-            className={`w-5 h-5 transition-all ${
+            className={`w-3.5 h-3.5 transition-all ${
               isFavorite
-                ? "fill-pink-rose text-pink-rose"
-                : "text-brown-dark group-hover:text-pink-rose"
+                ? "fill-brand-rose text-brand-rose"
+                : "text-brand-rose/60 group-hover:text-brand-rose"
             }`}
           />
         </motion.button>
       </div>
 
-      {/* Content */}
-      <div className="p-lg flex-1 flex flex-col">
-        {/* Flower Name */}
-        <h3 className="font-display text-2xl text-pink-rose mb-md font-bold transition-colors">
-          {name}
+      {/* Product Details Section */}
+      <div className="text-center w-full px-sm">
+        {/* Category / Occasion */}
+        <span className="font-ui text-[10px] sm:text-[11px] tracking-[0.25em] text-brand-green uppercase font-semibold mb-1.5 block">
+          {categoryLabel || "Collection"}
+        </span>
+
+        {/* Designer Serif Title */}
+        <h3 className="font-display text-lg sm:text-[21px] text-brand-rose font-medium tracking-wide mb-1 transition-colors leading-tight">
+          {designerTitle || name.split(" ")[0]}
         </h3>
 
-        {/* Romantic Message */}
-        <p className="font-body text-sm text-brown-dark/80 mb-lg line-clamp-2 italic">
-          "{romanticMessage}"
-        </p>
-
-        {/* Meaning */}
-        <div className="flex items-center gap-md mb-lg flex-1">
-          <span className="font-ui text-xs text-brown-earth font-semibold uppercase tracking-wide">
-            Meaning:
-          </span>
-          <span className="font-body text-sm text-brown-dark">{meaning}</span>
+        {/* Price Tag */}
+        <div className="font-ui text-[14px] sm:text-[16px] font-bold text-gray-800 flex items-center justify-center gap-2">
+          <span>${price || 100}</span>
+          {originalPrice && (
+            <span className="text-gray-400 font-normal line-through text-[12px]">
+              ${originalPrice}
+            </span>
+          )}
         </div>
-
-        {/* Action Buttons */}
-        <motion.div
-          className="flex gap-md mt-auto"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isHovered ? 1 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <button className="flex-1 py-md px-sm bg-pink-rose/10 hover:bg-pink-rose/20 text-pink-rose font-ui text-sm font-semibold rounded-lg transition-colors">
-            Read Story
-          </button>
-          <button className="py-md px-sm bg-brown-light/10 hover:bg-brown-light/20 text-brown-dark rounded-lg transition-colors">
-            <Icons.Share2 className="w-4 h-4" />
-          </button>
-        </motion.div>
       </div>
     </motion.div>
   );

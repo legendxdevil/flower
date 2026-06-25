@@ -6,23 +6,46 @@ export const ScrollToTop = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    // Check custom root snap container first, fallback to window
+    const container = document.getElementById("root-snap-container");
+    
     const toggleVisibility = () => {
-      if (window.pageYOffset > 500) {
+      const scrollPos = container ? container.scrollTop : window.pageYOffset;
+      if (scrollPos > 500) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
       }
     };
 
-    window.addEventListener("scroll", toggleVisibility);
-    return () => window.removeEventListener("scroll", toggleVisibility);
+    if (container) {
+      container.addEventListener("scroll", toggleVisibility);
+    } else {
+      window.addEventListener("scroll", toggleVisibility);
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", toggleVisibility);
+      } else {
+        window.removeEventListener("scroll", toggleVisibility);
+      }
+    };
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    const container = document.getElementById("root-snap-container");
+    if (container) {
+      container.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    } else {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
   };
 
   return (

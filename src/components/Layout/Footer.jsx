@@ -7,37 +7,37 @@ export const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative bg-brown-dark text-white overflow-hidden">
+    <footer id="footer-section" className="relative bg-white text-gray-800 border-t border-brand-rose/10 overflow-hidden">
       {/* Paper Texture Overlay */}
-      <PaperTexture className="absolute inset-0 z-0 opacity-10" />
+      <PaperTexture className="absolute inset-0 z-0 opacity-[0.02]" />
 
       {/* Main Footer Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-lg py-4xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2xl">
+      <div className="relative z-10 w-full px-6 md:px-12 lg:px-20 py-2xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-xl">
           
           {/* Logo & About */}
-          <div className="space-y-lg">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">🌹</span>
-              <span className="font-display text-3xl font-bold text-pink-rose uppercase tracking-tighter">
+          <div className="space-y-md">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl text-brand-rose">🌹</span>
+              <span className="font-display text-2xl font-semibold text-brand-green tracking-[0.2em] uppercase">
                 FLORIN
               </span>
             </div>
-            <p className="font-body text-sm text-brown-light/80 leading-relaxed max-w-xs">
+            <p className="font-body text-xs sm:text-sm text-brand-rose/70 leading-relaxed max-w-xs">
               Florin is an interactive showcase of Indian flowers of romance. 
               Celebrating the hidden beauty and meanings within nature's most perfect creations. 
               A digital tribute to botanical art and love.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {[Icons.Instagram, Icons.Twitter].map((Icon, i) => (
                 <motion.a
                   key={i}
                   href="#"
-                  className="p-3 bg-white/5 rounded-full hover:bg-pink-rose transition-all shadow-md"
-                  whileHover={{ y: -5, scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+                  className="p-2.5 bg-brand-pink-bg/40 rounded-full hover:bg-brand-rose hover:text-white text-brand-rose transition-all shadow-sm"
+                  whileHover={{ y: -3, scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <Icon className="w-5 h-5 text-white" />
+                  <Icon className="w-4 h-4" />
                 </motion.a>
               ))}
             </div>
@@ -45,15 +45,15 @@ export const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-display text-xl mb-xl text-pink-rose font-bold">Quick Links</h4>
-            <ul className="space-y-md">
+            <h4 className="font-display text-[15px] tracking-wider uppercase mb-lg text-brand-rose font-semibold">Quick Links</h4>
+            <ul className="space-y-sm">
               {["Gallery", "Stories", "About", "Contact", "Favorites"].map((item) => (
                 <li key={item}>
                   <a 
-                    href={`/${item.toLowerCase()}`} 
-                    className="font-ui text-sm text-brown-light/60 hover:text-white transition-colors flex items-center gap-2 group"
+                    href={`#`} 
+                    className="font-ui text-xs sm:text-sm text-brand-rose/70 hover:text-brand-rose transition-colors flex items-center gap-2 group"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-pink-rose group-hover:w-3 group-hover:bg-pink-accent transition-all" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-rose/30 group-hover:bg-brand-rose transition-all" />
                     {item}
                   </a>
                 </li>
@@ -63,36 +63,36 @@ export const Footer = () => {
 
           {/* Contact Info */}
           <div>
-            <h4 className="font-display text-xl mb-xl text-pink-rose font-bold">Get in Touch</h4>
-            <ul className="space-y-lg">
-              <li className="flex items-center gap-4 text-sm text-brown-light/60">
-                <Icons.Mail className="w-5 h-5 text-pink-rose shrink-0" />
+            <h4 className="font-display text-[15px] tracking-wider uppercase mb-lg text-brand-rose font-semibold">Get in Touch</h4>
+            <ul className="space-y-sm">
+              <li className="flex items-center gap-3 text-xs sm:text-sm text-brand-rose/70">
+                <Icons.Mail className="w-4 h-4 text-brand-rose shrink-0" />
                 <span>hello@florin.love</span>
               </li>
-              <li className="flex items-center gap-4 text-sm text-brown-light/60">
-                <Icons.MapPin className="w-5 h-5 text-pink-rose shrink-0" />
+              <li className="flex items-center gap-3 text-xs sm:text-sm text-brand-rose/70">
+                <Icons.MapPin className="w-4 h-4 text-brand-rose shrink-0" />
                 <span>Valley of Flowers, Uttarakhand, India</span>
               </li>
-              <li className="flex items-center gap-4 text-sm text-brown-light/60">
-                <Icons.Phone className="w-5 h-5 text-pink-rose shrink-0" />
+              <li className="flex items-center gap-3 text-xs sm:text-sm text-brand-rose/70">
+                <Icons.Phone className="w-4 h-4 text-brand-rose shrink-0" />
                 <span>+91 987 654 3210</span>
               </li>
             </ul>
           </div>
 
           {/* Newsletter / Romantic Greeting */}
-          <div className="p-xl bg-white/5 rounded-2xl border border-white/10 shadow-lg">
-            <h4 className="font-display text-xl mb-lg text-pink-rose font-bold">Join the Romance</h4>
-            <p className="font-body text-xs text-brown-light/60 mb-xl">
+          <div className="p-lg bg-brand-cream border border-brand-rose/15 rounded-2xl shadow-soft">
+            <h4 className="font-display text-[15px] tracking-wider uppercase mb-md text-brand-rose font-semibold">Join the Romance</h4>
+            <p className="font-body text-[11px] sm:text-xs text-brand-rose/70 mb-lg">
               Subscribe for weekly stories about romantic flowers and their meanings.
             </p>
             <div className="flex gap-2">
               <input 
                 type="email" 
                 placeholder="Your email..." 
-                className="w-full px-4 py-2 bg-white/10 rounded-lg text-sm text-white placeholder-white/30 border border-white/10 outline-none focus:border-pink-rose transition-colors"
+                className="w-full px-3 py-1.5 bg-white rounded-lg text-xs text-gray-800 placeholder-brand-rose/35 border border-brand-rose/20 outline-none focus:border-brand-rose transition-colors"
               />
-              <button className="px-4 py-2 bg-pink-rose text-white rounded-lg font-ui text-sm font-semibold hover:bg-pink-accent transition-all cursor-pointer">
+              <button className="px-3.5 py-1.5 bg-brand-rose text-white rounded-lg font-ui text-xs font-semibold hover:bg-brand-rose/90 transition-all cursor-pointer">
                 Join
               </button>
             </div>
@@ -100,14 +100,14 @@ export const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-4xl pt-xl border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-lg text-xs font-ui text-brown-light/40 tracking-widest uppercase">
+        <div className="mt-xl pt-lg border-t border-brand-rose/10 flex flex-col md:flex-row justify-between items-center gap-md text-[10px] font-ui text-brand-rose/50 tracking-widest uppercase">
           <p>© {currentYear} FLORIN • ALL RIGHTS RESERVED.</p>
-          <div className="flex items-center gap-2">
-            MADE WITH <Icons.Heart className="w-3 h-3 text-pink-rose fill-pink-rose animate-pulse" /> FOR A ROMANTIC SOUL
+          <div className="flex items-center gap-1.5">
+            MADE WITH <Icons.Heart className="w-3 h-3 text-brand-rose fill-brand-rose animate-pulse" /> FOR A ROMANTIC SOUL
           </div>
-          <div className="flex gap-xl">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+          <div className="flex gap-lg">
+            <a href="#" className="hover:text-brand-rose transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-brand-rose transition-colors">Terms of Service</a>
           </div>
         </div>
       </div>

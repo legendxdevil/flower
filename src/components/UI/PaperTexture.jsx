@@ -1,6 +1,6 @@
 import React from "react";
 
-export const PaperTexture = ({ children, className = "" }) => {
+export const PaperTexture = ({ children, className = "", contentClassName = "" }) => {
   return (
     <div className={`relative ${className}`}>
       {/* SVG Texture Overlay */}
@@ -33,7 +33,7 @@ export const PaperTexture = ({ children, className = "" }) => {
       </svg>
 
       {/* Content */}
-      <div className="relative z-10">{children}</div>
+      <div className={`relative z-10 ${contentClassName}`}>{children}</div>
     </div>
   );
 };

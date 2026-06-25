@@ -38,11 +38,20 @@ module.exports = {
           gold: "#D4AF37",
           cream: "#FFFAF0",
         },
+        brand: {
+          rose: "#c14756",     // raspberry
+          green: "#5f6c40",    // deep green
+          cream: "#f9f0eb",    // ivory
+          pinkBg: "#f2c0bf",   // blush pink
+          springGreen: "#aac05c" // spring green
+        },
       },
       fontFamily: {
-        display: ["Playfair Display", "serif"],
+        display: ["Zaslia", "Playfair Display", "serif"],
         body: ["Merriweather", "serif"],
         ui: ["Poppins", "sans-serif"],
+        zaslia: ["Zaslia", "serif"],
+        mustasurma: ["Mustasurma", "sans-serif"],
       },
       fontSize: {
         h1: ["72px", { lineHeight: "1.2", fontWeight: "700" }],

@@ -9,7 +9,7 @@ export const FeaturedCarousel = ({ flowers, favorites, onFavoriteClick, onFlower
 
   return (
     <div className="py-20 overflow-hidden bg-accent-cream/50 relative">
-      <div className="max-w-7xl mx-auto px-lg mb-12">
+      <div className="w-full px-6 md:px-12 lg:px-20 mb-12 mx-auto">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -31,7 +31,7 @@ export const FeaturedCarousel = ({ flowers, favorites, onFavoriteClick, onFlower
       </div>
 
       {/* Horizontal Scroll Area */}
-      <div className="flex gap-8 overflow-x-auto px-[max(calc((100vw-80rem)/2),1.5rem)] pb-12 no-scrollbar snap-x snap-mandatory">
+      <div className="flex gap-8 overflow-x-auto px-6 md:px-12 lg:px-20 pb-12 no-scrollbar snap-x snap-mandatory">
         {featured.map((flower, index) => (
           <motion.div
             key={flower.id}
